@@ -24,8 +24,12 @@
     [super didReceiveMemoryWarning];
     self.view.backgroundColor = [UIColor redColor];
 <<<<<<< HEAD
+<<<<<<< HEAD
     ////xixiixidsdsd
 //    hhhhh
+=======
+    ////xixiixi
+>>>>>>> parent of d3995c7... test
 =======
     ////xixiixi
 >>>>>>> parent of d3995c7... test
