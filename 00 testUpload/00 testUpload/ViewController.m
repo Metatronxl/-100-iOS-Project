@@ -24,6 +24,7 @@
     [super didReceiveMemoryWarning];
     self.view.backgroundColor = [UIColor redColor];
     ////xixiixidsdsd
+//    hhhhh
     self.view.backgroundColor = [UIColor redColor];
 
     // Dispose of any resources that can be recreated.
