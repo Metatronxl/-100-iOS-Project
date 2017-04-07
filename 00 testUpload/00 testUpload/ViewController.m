@@ -23,8 +23,12 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     self.view.backgroundColor = [UIColor redColor];
+<<<<<<< HEAD
     ////xixiixidsdsd
 //    hhhhh
+=======
+    ////xixiixi
+>>>>>>> parent of d3995c7... test
     self.view.backgroundColor = [UIColor redColor];
 
     // Dispose of any resources that can be recreated.
