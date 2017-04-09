@@ -1,4 +1,4 @@
-//
+ //
 //  ViewController.m
 //  GoogleMapsDemo
 //
@@ -116,12 +116,7 @@
     UIImageView *image1=[[UIImageView alloc]initWithImage:[UIImage imageNamed:image]];
 //    image1.frame=CGRectMake(0, 0, 27, 27);
     textFiled.leftView=image1;
-//    UILabel *paddingView = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 10, 25)];
-//    paddingView.text = @" ";
-//    paddingView.textColor = [UIColor darkGrayColor];
-//    paddingView.backgroundColor = [UIColor clearColor];
-//    textFiled.leftView = paddingView;
-//    textFiled.leftViewMode = UITextFieldViewModeAlways;
+
 }
 
 
@@ -183,18 +178,24 @@
 }
 
 - (void)textFieldChanged{
-    if ([_addressTextField.text isEqualToString:@""]) {
+    if ([_addressTextField.text isEqualToString:@""] && [_currentLocationTextField.text isEqualToString:@""]) {
         _mainTableView.hidden = YES;
         [_dataArray removeAllObjects];
         [_mainTableView reloadData];
-    }else{
+    }else if([_addressTextField isFirstResponder]){
+        _flag = (bool *)0;
         [_autoCompleteFetcher sourceTextHasChanged:_addressTextField.text];
+    }else if([_currentLocationTextField isFirstResponder]){
+        _flag = (bool *)1;
+         [_autoCompleteFetcher sourceTextHasChanged:_currentLocationTextField.text];
+    }else{
+    
     }
     
 }
 
 -(void)textFieldDidBeginEditing:(UITextField *)textField{
-    [_addressTextField selectAll:self];
+//    [_addressTextField selectAll:self];
 }
 #pragma  mark - Mapview Delegate
 - (void)mapView:(GMSMapView *)mapView didTapAtCoordinate:(CLLocationCoordinate2D)coordinate{
@@ -204,7 +205,7 @@
 
 - (void)mapView:(GMSMapView *)mapView willMove:(BOOL)gesture{
     
-    _addressTextField.text = @"";
+//    _addressTextField.text = @"";
 }
 
 - (void)mapView:(GMSMapView *)mapView didChangeCameraPosition:(GMSCameraPosition *)position{
@@ -216,10 +217,10 @@
             NSLog(@"%@",address.thoroughfare);
 
             if (_flag) {
-
+//
                 _currentLocationTextField.text = address.thoroughfare;
-//                _addressTextField.text =@"Where to";
-                _flag = (bool*)0;
+////                _addressTextField.text =@"Where to";
+//                _flag = (bool*)0;
             }else{
                 _addressTextField.text = address.thoroughfare;
             }
@@ -242,7 +243,7 @@
 }
 
 - (void)textFieldSelectAll{
-    [_addressTextField selectAll:self];
+//    [_addressTextField selectAll:self];
 }
 
 #pragma  mark - tableview delegate
