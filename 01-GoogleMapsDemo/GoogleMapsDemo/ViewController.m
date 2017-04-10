@@ -32,23 +32,12 @@
 
 @implementation ViewController
 
-- (void)viewWillAppear:(BOOL)animated{
-    [super viewWillAppear:animated];
-    
-    [_googleMapView addObserver:self forKeyPath:@"myLocation" options:NSKeyValueObservingOptionNew context:nil];
-}
 
-- (void)viewWillDisappear:(BOOL)animated
-{
-    [super viewWillDisappear:animated];
-    
-    [_googleMapView removeObserver:self forKeyPath:@"myLocation"];
-}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     //允许获取自己的定位
-    _googleMapView.myLocationEnabled = YES;
+//    _googleMapView.myLocationEnabled = YES;
    //首次定位时flag设置为1
     _flag = (bool*)1;
     // Do any additional setup after loading the view, typically from a nib.
@@ -178,18 +167,25 @@
 }
 
 - (void)textFieldChanged{
-    if ([_addressTextField.text isEqualToString:@""] && [_currentLocationTextField.text isEqualToString:@""]) {
-        _mainTableView.hidden = YES;
-        [_dataArray removeAllObjects];
-        [_mainTableView reloadData];
+
+    if([_currentLocationTextField isFirstResponder]){
+        if ([_currentLocationTextField.text isEqualToString:@""]) {
+            _mainTableView.hidden = YES;
+            [_dataArray removeAllObjects];
+            [_mainTableView reloadData];
+        }else{
+            _flag = (bool *)0;
+            [_autoCompleteFetcher sourceTextHasChanged:_addressTextField.text];
+        }
     }else if([_addressTextField isFirstResponder]){
-        _flag = (bool *)0;
-        [_autoCompleteFetcher sourceTextHasChanged:_addressTextField.text];
-    }else if([_currentLocationTextField isFirstResponder]){
-        _flag = (bool *)1;
-         [_autoCompleteFetcher sourceTextHasChanged:_currentLocationTextField.text];
-    }else{
-    
+        if ([_addressTextField.text isEqualToString:@""]) {
+            _mainTableView.hidden = YES;
+            [_dataArray removeAllObjects];
+            [_mainTableView reloadData];
+        }else{
+            _flag = (bool *)0;
+            [_autoCompleteFetcher sourceTextHasChanged:_addressTextField.text];
+        }
     }
     
 }
