@@ -13,7 +13,7 @@
 #import <GooglePlaces/GooglePlaces.h>
 #define GoogleMapKey @"AIzaSyC6UdZfvOoEvOL9fFHQPfRawNix38ToRgM"
 #define GooglePlaceKey @"AIzaSyBlE90Z0bf5G1cvk2j-ClyXbV-2UpoVqlE"
-@interface ViewController ()<GMSAutocompleteFetcherDelegate,GMSMapViewDelegate,CLLocationManagerDelegate,UITextFieldDelegate,UITableViewDataSource,UITableViewDelegate>{
+@interface ViewController ()<GMSAutocompleteViewControllerDelegate,GMSAutocompleteFetcherDelegate,GMSMapViewDelegate,CLLocationManagerDelegate,UITextFieldDelegate,UITableViewDataSource,UITableViewDelegate>{
     
     GMSMapView *_googleMapView;
     CLLocationManager *_loacationManager;
@@ -170,33 +170,22 @@
 }
 
 - (void)textFieldChanged{
-
-    if([_currentLocationTextField isFirstResponder]){
-        if ([_currentLocationTextField.text isEqualToString:@""]) {
-            _mainTableView.hidden = YES;
-            [_dataArray removeAllObjects];
-            [_mainTableView reloadData];
-        }else{
-            _flag = (bool *)1;
-            NSLog(@"%@",_currentLocationTextField.text);
-            if (_currentLocationTextField.text != nil) {
-                [_autoCompleteFetcher sourceTextHasChanged:_currentLocationTextField.text];
-            }
-        }
-    }else if([_addressTextField isFirstResponder]){
-        if ([_addressTextField.text isEqualToString:@""]) {
-            _mainTableView.hidden = YES;
-            [_dataArray removeAllObjects];
-            [_mainTableView reloadData];
-        }else{
-            _flag = (bool *)0;
-            if (_currentLocationTextField.text != nil) {
-                [_autoCompleteFetcher sourceTextHasChanged:_addressTextField.text];
-            }
-        }
-    }
     
+    if([_currentLocationTextField isFirstResponder]){
+            _flag = (bool *)1;
+            GMSAutocompleteViewController *acController = [[GMSAutocompleteViewController alloc] init];
+            acController.delegate = self;
+            [self presentViewController:acController animated:YES completion:nil];
+        
+    }else if([_addressTextField isFirstResponder]){
+        _flag = (bool *)0;
+        GMSAutocompleteViewController *acController = [[GMSAutocompleteViewController alloc] init];
+        acController.delegate = self;
+        [self presentViewController:acController animated:YES completion:nil];
+    }
 }
+
+
 
 -(void)textFieldDidBeginEditing:(UITextField *)textField{
 //    [_addressTextField selectAll:self];
@@ -309,6 +298,47 @@
     }];
     [_addressTextField resignFirstResponder];
 }
+
+#pragma mark - GooglePlace 自动填充
+// Handle the user's selection.
+- (void)viewController:(GMSAutocompleteViewController *)viewController
+didAutocompleteWithPlace:(GMSPlace *)place {
+    [self dismissViewControllerAnimated:YES completion:nil];
+    // Do something with the selected place.
+    NSLog(@"Place name %@", place.name);
+    NSLog(@"Place address %@", place.formattedAddress);
+    NSLog(@"Place attributions %@", place.attributions.string);
+    if (_flag) {
+        _currentLocationTextField.text = [NSString stringWithFormat:@"%@,%@",place.name,place.formattedAddress];
+        [self geoSearchWithString:_currentLocationTextField.text];
+        
+    }else{
+        _addressTextField.text =[NSString stringWithFormat:@"%@,%@",place.name,place.formattedAddress];
+        [self geoSearchWithString:_addressTextField.text];
+    }
+}
+
+- (void)viewController:(GMSAutocompleteViewController *)viewController
+didFailAutocompleteWithError:(NSError *)error {
+    [self dismissViewControllerAnimated:YES completion:nil];
+    // TODO: handle the error.
+    NSLog(@"Error: %@", [error description]);
+}
+
+// User canceled the operation.
+- (void)wasCancelled:(GMSAutocompleteViewController *)viewController {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+// Turn the network activity indicator on and off again.
+- (void)didRequestAutocompletePredictions:(GMSAutocompleteViewController *)viewController {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+}
+
+- (void)didUpdateAutocompletePredictions:(GMSAutocompleteViewController *)viewController {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
