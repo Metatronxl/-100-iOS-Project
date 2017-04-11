@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>icon</key>
+		<string>1.png</string>
+		<key>name</key>
+		<string>Jack</string>
+		<key>mobile</key>
+		<string>3213123</string>
+		<key>email</key>
+		<string>www.xixi@qq.com</string>
+		<key>notes</key>
+		<string>this is a test</string>
+	</dict>
+	<dict>
+		<key>icon</key>
+		<string>1.png</string>
+		<key>name</key>
+		<string>Jack-2</string>
+		<key>mobile</key>
+		<string>3213123-2</string>
+		<key>email</key>
+		<string>www.xixi@qq.com-2</string>
+		<key>notes</key>
+		<string>this is a test-2</string>
+	</dict>
+	<dict>
+		<key>icon</key>
+		<string>1.png</string>
+		<key>name</key>
+		<string>Jack-3</string>
+		<key>mobile</key>
+		<string>3213123-3</string>
+		<key>email</key>
+		<string>www.xixi@qq.com-3</string>
+		<key>notes</key>
+		<string>this is a test-3</string>
+	</dict>
+	<dict>
+		<key>icon</key>
+		<string>1.png</string>
+		<key>name</key>
+		<string>Jack-4</string>
+		<key>mobile</key>
+		<string>3213123-4</string>
+		<key>email</key>
+		<string>www.xixi@qq.com-4</string>
+		<key>notes</key>
+		<string>this is a test-4</string>
+	</dict>
+	<dict>
+		<key>icon</key>
+		<string>1.png-5</string>
+		<key>name</key>
+		<string>Jack-5</string>
+		<key>mobile</key>
+		<string>3213123-5</string>
+		<key>email</key>
+		<string>www.xixi@qq.com-5</string>
+		<key>notes</key>
+		<string>this is a test-5</string>
+	</dict>
+</array>
+</plist>
