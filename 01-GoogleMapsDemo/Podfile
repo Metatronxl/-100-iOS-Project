@@ -1,6 +1,8 @@
 platform :ios, '8.1'
 target "GoogleMapsDemo" do 
-pod 'GoogleMaps', '~> 1.13.2'
+pod 'GoogleMaps'
+pod 'GooglePlaces'
+pod 'GooglePlacePicker'
 pod 'AFNetworking', '~> 2.6.3'
 end
 

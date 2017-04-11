@@ -10,7 +10,9 @@
 #import "AFNetworking.h"
 #import "XLUITextField.h"
 #import <GoogleMaps/GoogleMaps.h>
+#import <GooglePlaces/GooglePlaces.h>
 #define GoogleMapKey @"AIzaSyC6UdZfvOoEvOL9fFHQPfRawNix38ToRgM"
+#define GooglePlaceKey @"AIzaSyBlE90Z0bf5G1cvk2j-ClyXbV-2UpoVqlE"
 @interface ViewController ()<GMSAutocompleteFetcherDelegate,GMSMapViewDelegate,CLLocationManagerDelegate,UITextFieldDelegate,UITableViewDataSource,UITableViewDelegate>{
     
     GMSMapView *_googleMapView;
@@ -36,6 +38,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [GMSPlacesClient provideAPIKey:GooglePlaceKey];
     //允许获取自己的定位
 //    _googleMapView.myLocationEnabled = YES;
    //首次定位时flag设置为1
@@ -174,8 +177,11 @@
             [_dataArray removeAllObjects];
             [_mainTableView reloadData];
         }else{
-            _flag = (bool *)0;
-            [_autoCompleteFetcher sourceTextHasChanged:_addressTextField.text];
+            _flag = (bool *)1;
+            NSLog(@"%@",_currentLocationTextField.text);
+            if (_currentLocationTextField.text != nil) {
+                [_autoCompleteFetcher sourceTextHasChanged:_currentLocationTextField.text];
+            }
         }
     }else if([_addressTextField isFirstResponder]){
         if ([_addressTextField.text isEqualToString:@""]) {
@@ -184,7 +190,9 @@
             [_mainTableView reloadData];
         }else{
             _flag = (bool *)0;
-            [_autoCompleteFetcher sourceTextHasChanged:_addressTextField.text];
+            if (_currentLocationTextField.text != nil) {
+                [_autoCompleteFetcher sourceTextHasChanged:_addressTextField.text];
+            }
         }
     }
     
