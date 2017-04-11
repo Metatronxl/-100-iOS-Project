@@ -169,20 +169,44 @@
     return YES;
 }
 
+//- (void)textFieldChanged{
+//    
+//    if([_currentLocationTextField isFirstResponder]){
+//            _flag = (bool *)1;
+//            GMSAutocompleteViewController *acController = [[GMSAutocompleteViewController alloc] init];
+//            acController.delegate = self;
+//            [self presentViewController:acController animated:YES completion:nil];
+//        
+//    }else if([_addressTextField isFirstResponder]){
+//        _flag = (bool *)0;
+//        GMSAutocompleteViewController *acController = [[GMSAutocompleteViewController alloc] init];
+//        acController.delegate = self;
+//        [self presentViewController:acController animated:YES completion:nil];
+//    }
+//}
+
 - (void)textFieldChanged{
     
     if([_currentLocationTextField isFirstResponder]){
-            _flag = (bool *)1;
-            GMSAutocompleteViewController *acController = [[GMSAutocompleteViewController alloc] init];
-            acController.delegate = self;
-            [self presentViewController:acController animated:YES completion:nil];
-        
+        if ([_currentLocationTextField.text isEqualToString:@""]) {
+            _mainTableView.hidden = YES;
+            [_dataArray removeAllObjects];
+            [_mainTableView reloadData];
+        }else{
+            _flag = (bool *)0;
+            [_autoCompleteFetcher sourceTextHasChanged:_addressTextField.text];
+        }
     }else if([_addressTextField isFirstResponder]){
-        _flag = (bool *)0;
-        GMSAutocompleteViewController *acController = [[GMSAutocompleteViewController alloc] init];
-        acController.delegate = self;
-        [self presentViewController:acController animated:YES completion:nil];
+        if ([_addressTextField.text isEqualToString:@""]) {
+            _mainTableView.hidden = YES;
+            [_dataArray removeAllObjects];
+            [_mainTableView reloadData];
+        }else{
+            _flag = (bool *)0;
+            [_autoCompleteFetcher sourceTextHasChanged:_addressTextField.text];
+        }
     }
+    
 }
 
 
@@ -227,6 +251,12 @@
     if (predictions.count) {
         _mainTableView.hidden = NO;
         _dataArray = (NSMutableArray *)predictions;
+        
+        //对每一个遍历到的地点在地图上进行标记
+        for(int i=0;i<_dataArray.count;i++){
+            GMSAutocompletePrediction *prediction = _dataArray[i];
+            [self getCoordinateWithString:prediction.attributedFullText.string];
+        }
         [_mainTableView reloadData];
     }
 }
@@ -254,6 +284,9 @@
     }
     GMSAutocompletePrediction *prediction = _dataArray[indexPath.row];
     cell.textLabel.text = prediction.attributedFullText.string;
+    
+//    [self getCoordinateWithString:cell.textLabel.text];
+    
     return cell;
 }
 
@@ -272,6 +305,32 @@
     GMSAutocompletePrediction *prediction = _dataArray[indexPath.row];
     [self geoSearchWithString:prediction.attributedFullText.string];
     _mainTableView.hidden = YES;
+    
+}
+
+//根据搜索的地址在地图上进行地址标记
+- (void)getCoordinateWithString:(NSString *)string{
+    /**
+     *  发起地理编码请求
+     */
+    NSString *urlString = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/geocode/json?address=%@&key=%@",[string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],GoogleMapKey];
+    AFHTTPRequestOperationManager *manager = [[AFHTTPRequestOperationManager alloc] init];
+    [manager GET:urlString parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSDictionary *responseDic = responseObject;
+        if ([responseDic[@"status"] isEqualToString:@"OK"]) {
+            NSArray *returenArray = responseDic[@"results"];
+            CLLocationCoordinate2D search ;
+            NSDictionary *addressDic = returenArray[0];
+            NSDictionary *locationDic = addressDic[@"geometry"][@"location"];
+            search.longitude = [locationDic[@"lng"] floatValue];
+            search.latitude = [locationDic[@"lat"] floatValue];
+            GMSMarker *marker = [GMSMarker markerWithPosition:search];
+            marker.map= _googleMapView;
+        }
+        
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        
+    }];
     
 }
 
