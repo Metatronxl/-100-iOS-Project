@@ -30,7 +30,22 @@
 ```    
 > 3. 自定义UINavigationController来定制样式，并使其为基模板。
  
-
+### [05-GoogleMap API](https://github.com/Metatronxl/-100-iOS-Project/tree/master/01-GoogleMapsDemo)
+> 对01的demo进行了修改，将系统自带的单元格换成了自制的单元格
+> 使用自定义cell的注意点
+```objc
+     1.设置cell的identifier的时候一定要设置为xib的名字
+     2. 设置自定义cell一定要注册，不然系统无法识别
+     3.网上所说的xib的identifier也要设置成xib的名字是扯淡，亲测写成test也能成功跑通：）
+    //自定义单元格样式
+    static NSString *identifierString = @"XLMapViewCell";
+    XLMapTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifierString];
+    if (cell==nil) {
+        NSArray *nib = [[NSBundle mainBundle] loadNibNamed:identifierString owner:self options:nil];
+        cell = [nib objectAtIndex:0];
+    }
+    
+```
 
 
 
