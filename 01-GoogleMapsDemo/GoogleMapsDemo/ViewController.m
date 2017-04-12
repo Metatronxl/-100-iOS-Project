@@ -11,8 +11,11 @@
 #import "XLUITextField.h"
 #import <GoogleMaps/GoogleMaps.h>
 #import <GooglePlaces/GooglePlaces.h>
+#import "XLMapTableViewCell.h"
 #define GoogleMapKey @"AIzaSyC6UdZfvOoEvOL9fFHQPfRawNix38ToRgM"
 #define GooglePlaceKey @"AIzaSyBlE90Z0bf5G1cvk2j-ClyXbV-2UpoVqlE"
+static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
+
 @interface ViewController ()<GMSAutocompleteViewControllerDelegate,GMSAutocompleteFetcherDelegate,GMSMapViewDelegate,CLLocationManagerDelegate,UITextFieldDelegate,UITableViewDataSource,UITableViewDelegate>{
     
     GMSMapView *_googleMapView;
@@ -49,11 +52,21 @@
     [self createMapView];
     [self createCenterViw];
     [self createTextField];
+//    [self registerNib];
     _autoCompleteFetcher = [[GMSAutocompleteFetcher alloc] init];
     _autoCompleteFetcher.delegate = self;
     _dataArray = [NSMutableArray array];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldSelectAll) name:UIKeyboardDidShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textFieldChanged) name:UITextFieldTextDidChangeNotification object:nil];
+}
+//生成自定义的单元格
+- (void)registerNib{
+    static BOOL nibsRegistered = NO;
+    if (!nibsRegistered) {
+        UINib *nib = [UINib nibWithNibName:@"XLMapTableViewCell" bundle:nil];
+        [_mainTableView registerNib:nib forCellReuseIdentifier:CustomCellIdentifier];
+        nibsRegistered = YES;
+    }
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -96,7 +109,7 @@
     [self.view addSubview:_addressTextField];
 
     
-    _mainTableView = [[UITableView alloc] initWithFrame:CGRectMake(20, 100, self.view.bounds.size.width-40, 200) style:UITableViewStyleGrouped];
+    _mainTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 90, self.view.bounds.size.width, 200) style:UITableViewStyleGrouped];
     _mainTableView.delegate = self;
     _mainTableView.dataSource = self;
     [self.view addSubview:_mainTableView];
@@ -278,14 +291,24 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-    if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"cell"];
+    //自定义单元格样式
+    static NSString *identifierString = @"XLMapViewCell";
+    XLMapTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifierString];
+    if (cell==nil) {
+        NSArray *nib = [[NSBundle mainBundle] loadNibNamed:identifierString owner:self options:nil];
+        cell = [nib objectAtIndex:0];
     }
-    GMSAutocompletePrediction *prediction = _dataArray[indexPath.row];
-    cell.textLabel.text = prediction.attributedFullText.string;
     
-//    [self getCoordinateWithString:cell.textLabel.text];
+    
+    GMSAutocompletePrediction *prediction = _dataArray[indexPath.row];
+    NSLog(@"%@",prediction.attributedPrimaryText.string);
+    NSLog(@"%@",prediction.attributedFullText.string);
+    NSLog(@"%@",prediction.attributedSecondaryText.string);
+    
+    
+    cell.addressLabel.text = prediction.attributedPrimaryText.string;
+    cell.detailedAddressLabel.text = prediction.attributedFullText.string;
+    
     
     return cell;
 }
@@ -298,7 +321,8 @@
     return 0.001f;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{    return 40.0f;
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return 70.0f;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
