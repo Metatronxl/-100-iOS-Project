@@ -20,9 +20,9 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3.2 mi" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uej-9k-Wf0">
-                        <rect key="frame" x="12" y="41" width="40" height="21"/>
+                        <rect key="frame" x="0.0" y="41" width="52" height="21"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="40" id="KdO-bj-ywe"/>
+                            <constraint firstAttribute="width" constant="52" id="KdO-bj-ywe"/>
                             <constraint firstAttribute="height" constant="21" id="t1s-ca-RVj"/>
                         </constraints>
                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -58,7 +58,7 @@
                     </imageView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="uej-9k-Wf0" firstAttribute="leading" secondItem="wrR-G8-esI" secondAttribute="leading" constant="12" id="4j5-Yw-amt"/>
+                    <constraint firstItem="uej-9k-Wf0" firstAttribute="leading" secondItem="wrR-G8-esI" secondAttribute="leading" id="4j5-Yw-amt"/>
                     <constraint firstItem="ggv-rg-Hu5" firstAttribute="top" secondItem="WvA-gN-77p" secondAttribute="bottom" constant="4" id="84o-on-iER"/>
                     <constraint firstItem="uej-9k-Wf0" firstAttribute="top" secondItem="wrR-G8-esI" secondAttribute="top" constant="41" id="9oh-nQ-eeo"/>
                     <constraint firstItem="asn-23-weh" firstAttribute="top" secondItem="wrR-G8-esI" secondAttribute="topMargin" id="HQI-fT-HTw"/>
