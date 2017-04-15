@@ -35,8 +35,8 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
 //存放搜索到的地址经纬度CLLocationCoordinate2D
 @property (nonatomic,strong) NSMutableArray *locationArray;
 @property (nonatomic,strong) NSDictionary *coordinateDic;
+//用于判断是否所有的地点的异步距离计算进程已经执行完毕（googleAPI不允许在非主线程执行）
 @property (nonatomic,assign) int countNum;
-
 //判断是否是第一次获取定位地址，并将其设为自身定位
 @property (nonatomic,assign) bool *flag;
 
@@ -51,9 +51,8 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
     [GMSPlacesClient provideAPIKey:GooglePlaceKey];
     
     _locationArray = [NSMutableArray array];
+    //初始化计数变量
     _countNum = 0;
-    //允许获取自己的定位
-//    _googleMapView.myLocationEnabled = YES;
    //首次定位时flag设置为1
     _flag = (bool*)1;
     // Do any additional setup after loading the view, typically from a nib.
@@ -245,8 +244,6 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
             if (_flag) {
 //
                 _currentLocationTextField.text = address.thoroughfare;
-////                _addressTextField.text =@"Where to";
-//                _flag = (bool*)0;
             }else{
                 _addressTextField.text = address.thoroughfare;
             }
@@ -302,9 +299,6 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
     
     
     GMSAutocompletePrediction *prediction = _dataArray[indexPath.row];
-//    NSLog(@"%@",prediction.attributedPrimaryText.string);
-//    NSLog(@"%@",prediction.attributedFullText.string);
-//    NSLog(@"%@",prediction.attributedSecondaryText.string);
     //取得获得的经纬度结构体
     CLLocationCoordinate2D search;
     if (_locationArray.count ==0) {
@@ -313,22 +307,15 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
         NSDictionary *tmpDic = [_locationArray objectAtIndex:indexPath.row];
         search.latitude =  [tmpDic[@"lat"] floatValue];
         search.longitude = [tmpDic[@"lng"] floatValue];
-        NSLog(@"%f--%f",search.latitude,search.longitude);
-//cameraWithLatitude:_googleMapView.myLocation.coordinate.latitude
-//longitude:_googleMapView.myLocation.coordinate.longitude
-        NSLog(@"%f---%f",_googleMapView.myLocation.coordinate.latitude,_googleMapView.myLocation.coordinate.longitude);
+//        NSLog(@"%f--%f",search.latitude,search.longitude);
+//        NSLog(@"%f---%f",_googleMapView.myLocation.coordinate.latitude,_googleMapView.myLocation.coordinate.longitude);
     
         CLLocation *orig=[[CLLocation alloc] initWithLatitude:_googleMapView.myLocation.coordinate.latitude longitude:_googleMapView.myLocation.coordinate.longitude];
         CLLocation *dist=[[CLLocation alloc] initWithLatitude:search.latitude longitude:search.longitude];
         CLLocationDistance kilometers=[orig distanceFromLocation:dist]/1000;
         cell.distanceLabel.text = [NSString stringWithFormat:@"%.1fkm",kilometers];
-        
-//    NSLog(@"%f",kilometers);
     }
     
-//    CLLocation* dist=[[[CLLocation alloc] initWithLatitude:[tmpNewsModel.latitude doubleValue] longitude:[tmpNewsModel.longitude doubleValue] ] autorelease];
-//    
-//    NSLog(@"距离:",kilometers);
     
     cell.addressLabel.text = prediction.attributedPrimaryText.string;
     cell.detailedAddressLabel.text = prediction.attributedFullText.string;
@@ -387,6 +374,7 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
             
             [_locationArray addObject:_coordinateDic];
             _countNum +=1;
+            //判断是否所有计算距离子线程执行完毕，完毕后刷新table，实现距离的显示
             if (_countNum == _dataArray.count) {
                 [_mainTableView reloadData];
                  _mainTableView.hidden = NO;
@@ -416,12 +404,7 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
             NSDictionary *locationDic = addressDic[@"geometry"][@"location"];
             search.longitude = [locationDic[@"lng"] floatValue];
             search.latitude = [locationDic[@"lat"] floatValue];
-//            //将CLLocationCoordinate2D对象封装
-            
-//            [_locationArray addObject:[NSValue value:&search withObjCType:@encode(CLLocationCoordinate2D)]];
-            
-            
-//            
+          
             [_googleMapView animateToLocation:search];
         }
         
