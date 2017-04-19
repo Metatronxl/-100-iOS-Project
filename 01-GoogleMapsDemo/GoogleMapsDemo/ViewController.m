@@ -188,7 +188,7 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField{
-    [self geoSearchWithString:textField.text];
+    [self getCoordinateWithString:textField.text];
     [textField resignFirstResponder];
     return YES;
 }
@@ -434,7 +434,7 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         
     }];
-    [_addressTextField resignFirstResponder];
+//    [_addressTextField resignFirstResponder];
 }
 
 
