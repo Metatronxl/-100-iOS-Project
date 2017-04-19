@@ -320,7 +320,12 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
     
     
     cell.addressLabel.text = cellDic[@"name"];
-    cell.detailedAddressLabel.text = cellDic[@"name"];
+    cell.detailedAddressLabel.text = cellDic[@"vicinity"];
+    
+//    NSString *imgURLstring = cellDic[@"icon"];
+//    NSURL *url = [NSURL URLWithString: imgURLstring];
+//    UIImage *detailImage = [UIImage imageWithData: [NSData dataWithContentsOfURL:url]];
+//    cell.cellImage.image = detailImage;
     
 
     
@@ -360,7 +365,7 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
     //清除地图上的所有标记
     [_googleMapView clear];
     
-    NSString *urlString = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=%f,%f&radius=5000&keyword=%@&key=%@",_googleMapView.myLocation.coordinate.latitude,_googleMapView.myLocation.coordinate.longitude,[string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],GoogleMapKey];
+    NSString *urlString = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=%f,%f&radius=50000&keyword=%@&key=%@",_googleMapView.myLocation.coordinate.latitude,_googleMapView.myLocation.coordinate.longitude,[string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],GoogleMapKey];
     AFHTTPRequestOperationManager *manager = [[AFHTTPRequestOperationManager alloc] init];
     [manager GET:urlString parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSDictionary *responseDic = responseObject;
