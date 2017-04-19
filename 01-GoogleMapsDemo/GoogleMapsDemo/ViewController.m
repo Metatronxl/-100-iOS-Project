@@ -243,12 +243,8 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
             GMSAddress *address = response.results[0];
             NSLog(@"%@",address.thoroughfare);
 
-            if (_flag) {
-//
-                _currentLocationTextField.text = address.thoroughfare;
-            }else{
-                _addressTextField.text = address.thoroughfare;
-            }
+            _addressTextField.text = address.thoroughfare;
+
             
         }
     }];
@@ -267,8 +263,6 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
             GMSAutocompletePrediction *prediction = _dataArray[i];
             [weakSelf getCoordinateWithString:prediction.attributedFullText.string];
         }
-        
-//        [_mainTableView reloadData];
     
         
     }
@@ -309,8 +303,7 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
         NSDictionary *tmpDic = [_locationArray objectAtIndex:indexPath.row];
         search.latitude =  [tmpDic[@"lat"] floatValue];
         search.longitude = [tmpDic[@"lng"] floatValue];
-//        NSLog(@"%f--%f",search.latitude,search.longitude);
-//        NSLog(@"%f---%f",_googleMapView.myLocation.coordinate.latitude,_googleMapView.myLocation.coordinate.longitude);
+
     
         CLLocation *orig=[[CLLocation alloc] initWithLatitude:_googleMapView.myLocation.coordinate.latitude longitude:_googleMapView.myLocation.coordinate.longitude];
         CLLocation *dist=[[CLLocation alloc] initWithLatitude:search.latitude longitude:search.longitude];
@@ -347,8 +340,8 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     
-    GMSAutocompletePrediction *prediction = _dataArray[indexPath.row];
-    [self geoSearchWithString:prediction.attributedFullText.string];
+    NSDictionary *tmpCellDic = _dataArray[indexPath.row];
+    [self geoSearchWithString:tmpCellDic[@"vicinity"]];
     _mainTableView.hidden = YES;
     //清除地图上的所有标记
     [_googleMapView clear];
@@ -370,8 +363,11 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
     [manager GET:urlString parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSDictionary *responseDic = responseObject;
         if ([responseDic[@"status"] isEqualToString:@"OK"]) {
-            _dataArray = responseDic[@"results"];
-//            NSArray *returenArray = responseDic[@"results"];
+           //循环添加避免dataArray变成不可变数组
+            NSMutableArray *tmpResponseArr = responseDic[@"results"];
+            for(int i=0;i<tmpResponseArr.count;i++){
+                [_dataArray addObject:tmpResponseArr[i]];
+            }
             CLLocationCoordinate2D search ;
             for(int i=0;i<_dataArray.count;i++){
                 NSDictionary *addressDic = _dataArray[i];
@@ -403,9 +399,10 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
 - (void)geoSearchWithString:(NSString *)string{
     /**
      *  发起地理编码请求
-      NSString *urlString = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/geocode/json?address=%@&key=%@",[string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],GoogleMapKey];
+     
      */
-    NSString *urlString = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=%f,%f&radius=500&keyword=%@&key=%@",_googleMapView.myLocation.coordinate.latitude,_googleMapView.myLocation.coordinate.longitude,[string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],GoogleMapKey];
+//    NSString *urlString = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=%f,%f&radius=500&keyword=%@&key=%@",_googleMapView.myLocation.coordinate.latitude,_googleMapView.myLocation.coordinate.longitude,[string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],GoogleMapKey];
+     NSString *urlString = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/geocode/json?address=%@&key=%@",[string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],GoogleMapKey];
     AFHTTPRequestOperationManager *manager = [[AFHTTPRequestOperationManager alloc] init];
     [manager GET:urlString parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSDictionary *responseDic = responseObject;
@@ -426,24 +423,7 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
     [_addressTextField resignFirstResponder];
 }
 
-//#pragma mark - GooglePlace 自动填充
-//// Handle the user's selection.
-//- (void)viewController:(GMSAutocompleteViewController *)viewController
-//didAutocompleteWithPlace:(GMSPlace *)place {
-//    [self dismissViewControllerAnimated:YES completion:nil];
-//    // Do something with the selected place.
-//    NSLog(@"Place name %@", place.name);
-//    NSLog(@"Place address %@", place.formattedAddress);
-//    NSLog(@"Place attributions %@", place.attributions.string);
-//    if (_flag) {
-//        _currentLocationTextField.text = [NSString stringWithFormat:@"%@,%@",place.name,place.formattedAddress];
-//        [self geoSearchWithString:_currentLocationTextField.text];
-//        
-//    }else{
-//        _addressTextField.text =[NSString stringWithFormat:@"%@,%@",place.name,place.formattedAddress];
-//        [self geoSearchWithString:_addressTextField.text];
-//    }
-//}
+
 
 - (void)viewController:(GMSAutocompleteViewController *)viewController
 didFailAutocompleteWithError:(NSError *)error {
