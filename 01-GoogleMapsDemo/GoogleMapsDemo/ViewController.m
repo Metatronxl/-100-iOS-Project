@@ -39,6 +39,7 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
 @property (nonatomic,assign) int countNum;
 //判断是否是第一次获取定位地址，并将其设为自身定位
 @property (nonatomic,assign) bool *flag;
+@property (nonatomic,assign) bool *focusFlag;
 
 @end
 
@@ -55,6 +56,7 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
     _countNum = 0;
    //首次定位时flag设置为1
     _flag = (bool*)1;
+    _focusFlag = (bool*)1;
     // Do any additional setup after loading the view, typically from a nib.
     //设置背景颜色
     self.view.backgroundColor = [UIColor colorWithRed:242/255.f green:80/255.f blue:55/255.f alpha:1];
@@ -224,6 +226,14 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
 -(void)textFieldDidBeginEditing:(UITextField *)textField{
 //    [_addressTextField selectAll:self];
 }
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField{
+    if ([_addressTextField isFirstResponder]) {
+        _focusFlag = (bool *)1;
+    }else{
+        _focusFlag = (bool *)0;
+    }
+    return YES;
+}// return NO to disallow editing.
 #pragma  mark - Mapview Delegate
 - (void)mapView:(GMSMapView *)mapView didTapAtCoordinate:(CLLocationCoordinate2D)coordinate{
     _mainTableView.hidden =YES;
@@ -242,8 +252,12 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
         if (response.results) {
             GMSAddress *address = response.results[0];
             NSLog(@"%@",address.thoroughfare);
-
-            _addressTextField.text = address.thoroughfare;
+            if (_focusFlag) {
+                _currentLocationTextField.text = address.thoroughfare;
+            }else{
+                _addressTextField.text = address.thoroughfare;
+            }
+            
 
             
         }
