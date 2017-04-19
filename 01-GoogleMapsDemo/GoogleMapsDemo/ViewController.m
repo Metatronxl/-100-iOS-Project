@@ -201,8 +201,9 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
             [_dataArray removeAllObjects];
             [_mainTableView reloadData];
         }else{
-            _flag = (bool *)0;
-            [_autoCompleteFetcher sourceTextHasChanged:_addressTextField.text];
+            _flag = (bool *)1;
+            [self getCoordinateWithString:_currentLocationTextField.text];
+//            [_autoCompleteFetcher sourceTextHasChanged:_currentLocationTextField.text];
         }
     }else if([_addressTextField isFirstResponder]){
         if ([_addressTextField.text isEqualToString:@""]) {
@@ -211,7 +212,8 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
             [_mainTableView reloadData];
         }else{
             _flag = (bool *)0;
-            [_autoCompleteFetcher sourceTextHasChanged:_addressTextField.text];
+            [self getCoordinateWithString:_addressTextField.text];
+//            [_autoCompleteFetcher sourceTextHasChanged:_addressTextField.text];
         }
     }
     
@@ -298,7 +300,7 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
     }
     
     
-    GMSAutocompletePrediction *prediction = _dataArray[indexPath.row];
+    NSDictionary *cellDic = _dataArray[indexPath.row];
     //取得获得的经纬度结构体
     CLLocationCoordinate2D search;
     if (_locationArray.count ==0) {
@@ -317,8 +319,8 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
     }
     
     
-    cell.addressLabel.text = prediction.attributedPrimaryText.string;
-    cell.detailedAddressLabel.text = prediction.attributedFullText.string;
+    cell.addressLabel.text = cellDic[@"name"];
+    cell.detailedAddressLabel.text = cellDic[@"name"];
     
 
     
@@ -363,22 +365,26 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
     [manager GET:urlString parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSDictionary *responseDic = responseObject;
         if ([responseDic[@"status"] isEqualToString:@"OK"]) {
-            NSArray *returenArray = responseDic[@"results"];
+            _dataArray = responseDic[@"results"];
+//            NSArray *returenArray = responseDic[@"results"];
             CLLocationCoordinate2D search ;
-            NSDictionary *addressDic = returenArray[0];
-            _coordinateDic = addressDic[@"geometry"][@"location"];
-            search.longitude = [_coordinateDic[@"lng"] floatValue];
-            search.latitude = [_coordinateDic[@"lat"] floatValue];
-            GMSMarker *marker = [GMSMarker markerWithPosition:search];
-            marker.map= _googleMapView;
-            
-            [_locationArray addObject:_coordinateDic];
-            _countNum +=1;
-            //判断是否所有计算距离子线程执行完毕，完毕后刷新table，实现距离的显示
-            if (_countNum == _dataArray.count) {
-                [_mainTableView reloadData];
-                 _mainTableView.hidden = NO;
-                _countNum =0;
+            for(int i=0;i<_dataArray.count;i++){
+                NSDictionary *addressDic = _dataArray[i];
+                _coordinateDic = addressDic[@"geometry"][@"location"];
+                search.longitude = [_coordinateDic[@"lng"] floatValue];
+                search.latitude = [_coordinateDic[@"lat"] floatValue];
+                GMSMarker *marker = [GMSMarker markerWithPosition:search];
+                marker.map= _googleMapView;
+                
+                [_locationArray addObject:_coordinateDic];
+                _countNum +=1;
+                //判断是否所有计算距离子线程执行完毕，完毕后刷新table，实现距离的显示
+                if (_countNum == _dataArray.count) {
+                    [_mainTableView reloadData];
+                    _mainTableView.hidden = NO;
+                    _countNum =0;
+                }
+
             }
             
         }
@@ -415,24 +421,24 @@ static NSString *CustomCellIdentifier = @"CustomCellIdentifier";
     [_addressTextField resignFirstResponder];
 }
 
-#pragma mark - GooglePlace 自动填充
-// Handle the user's selection.
-- (void)viewController:(GMSAutocompleteViewController *)viewController
-didAutocompleteWithPlace:(GMSPlace *)place {
-    [self dismissViewControllerAnimated:YES completion:nil];
-    // Do something with the selected place.
-    NSLog(@"Place name %@", place.name);
-    NSLog(@"Place address %@", place.formattedAddress);
-    NSLog(@"Place attributions %@", place.attributions.string);
-    if (_flag) {
-        _currentLocationTextField.text = [NSString stringWithFormat:@"%@,%@",place.name,place.formattedAddress];
-        [self geoSearchWithString:_currentLocationTextField.text];
-        
-    }else{
-        _addressTextField.text =[NSString stringWithFormat:@"%@,%@",place.name,place.formattedAddress];
-        [self geoSearchWithString:_addressTextField.text];
-    }
-}
+//#pragma mark - GooglePlace 自动填充
+//// Handle the user's selection.
+//- (void)viewController:(GMSAutocompleteViewController *)viewController
+//didAutocompleteWithPlace:(GMSPlace *)place {
+//    [self dismissViewControllerAnimated:YES completion:nil];
+//    // Do something with the selected place.
+//    NSLog(@"Place name %@", place.name);
+//    NSLog(@"Place address %@", place.formattedAddress);
+//    NSLog(@"Place attributions %@", place.attributions.string);
+//    if (_flag) {
+//        _currentLocationTextField.text = [NSString stringWithFormat:@"%@,%@",place.name,place.formattedAddress];
+//        [self geoSearchWithString:_currentLocationTextField.text];
+//        
+//    }else{
+//        _addressTextField.text =[NSString stringWithFormat:@"%@,%@",place.name,place.formattedAddress];
+//        [self geoSearchWithString:_addressTextField.text];
+//    }
+//}
 
 - (void)viewController:(GMSAutocompleteViewController *)viewController
 didFailAutocompleteWithError:(NSError *)error {
