@@ -1,5 +1,5 @@
 # -100-iOS-Project
-每天上传一个DEMO，发现打脸了请``大力戳我``：）
+IOS弃坑 :)
 
 ### [01-GoogleMap API](https://github.com/Metatronxl/-100-iOS-Project/tree/master/01-GoogleMapsDemo)
 >1.使用了googleMap API
